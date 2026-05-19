@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     DB_USER: str = 'user'
     DB_PASSWORD: str = '543894758943'
     DB_HOST: str = 'db'
-    DB_PORT: int = 5432
+    DB_PORT: int = 5433
     DB_NAME: str = 'todos'
 
     @property

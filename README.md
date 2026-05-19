@@ -14,7 +14,7 @@ A professional, production-ready RESTful API for personal task management. This 
 ## 🛠 Tech Stack
 
 - **Backend:** [FastAPI](https://tiangolo.com) (Python 3.12+)
-- **Database:** [PostgreSQL](https://postgresql.org) (Production), SQLite (Testing)
+- **Database:** [PostgreSQL](https://postgresql.org) (Production: port 5432 | Standalone Dev: port 5433), SQLite (Testing)
 - **ORM:** [SQLAlchemy 2.0](https://sqlalchemy.org)
 - **Migrations:** [Alembic](https://sqlalchemy.org)
 - **Containerization:** [Docker](https://docker.com) & Docker Compose
@@ -24,6 +24,8 @@ A professional, production-ready RESTful API for personal task management. This 
 ## 📦 Quick Start (Docker)
 
 The fastest way to get the project up and running is using Docker Compose. It automatically configures the database, applies migrations, and starts the API.
+
+> 💡 **Note:** If you want to spin up the entire ecosystem (API + Telegram Bot + Redis + PostgreSQL), please use the main `docker-compose.yml` located in the **FastAPI-todo-Telegram-Bot** repository root.
 
 1.  **Clone the repository:**
     ```bash
@@ -52,7 +54,7 @@ To run the project locally for development purposes:
     pip install -r requirements.txt
     ```
 2.  **Start the Database:**
-    Ensure PostgreSQL is running (e.g., `docker-compose up -d db`). Update `DB_HOST=localhost` in your `.env`.
+    Ensure PostgreSQL is running (e.g., `docker-compose up -d db`). Update `DB_HOST=localhost` and `DB_PORT=5433` in your `.env`.
 3.  **Apply Migrations:**
     ```bash
     alembic upgrade head

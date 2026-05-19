@@ -9,11 +9,12 @@ services:
         condition: service_healthy  
     environment:
       - DB_HOST=db
+      - DB_PORT=5432
     volumes:
       - .:/app       
   db:
     image: postgres:16-alpine
-    container_name: tasks_db
+    container_name: api_tasks_db
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
@@ -24,9 +25,9 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - api_postgres_data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  api_postgres_data:
