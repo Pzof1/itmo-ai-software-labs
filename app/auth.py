@@ -1,11 +1,13 @@
-from datetime import datetime, timedelta, timezone
-from .config import settings
+from datetime import UTC, datetime, timedelta
+
 import bcrypt
 from jose import jwt
 
+from .config import settings
+
 
 def hash_password(password: str) -> str:
-    """Hash a plain-text password using bcrypt. 
+    """Hash a plain-text password using bcrypt.
 
     Args:
         password (str): The plain-text password to hash.
@@ -13,10 +15,10 @@ def hash_password(password: str) -> str:
     Returns:
         str: The hashed password.
     """
-    pwd_bytes = password.encode('utf-8')
+    pwd_bytes = password.encode("utf-8")
     salt = bcrypt.gensalt()
     hashed = bcrypt.hashpw(pwd_bytes, salt)
-    return hashed.decode('utf-8')
+    return hashed.decode("utf-8")
 
 
 def verify_password(password: str, hashed_password: str) -> bool:
@@ -29,10 +31,7 @@ def verify_password(password: str, hashed_password: str) -> bool:
     Returns:
         bool: True if the password matches the hash, False otherwise.
     """
-    return bcrypt.checkpw(
-        password.encode('utf-8'),
-        hashed_password.encode('utf-8')
-    )
+    return bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8"))
 
 
 def create_access_token(payload: dict) -> str:
@@ -45,8 +44,7 @@ def create_access_token(payload: dict) -> str:
         str: JWT token.
     """
     data = payload.copy()
-    exp_time = datetime.now(timezone.utc) + \
-        timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE)
-    data['exp'] = exp_time
+    exp_time = datetime.now(UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE)
+    data["exp"] = exp_time
     token = jwt.encode(data, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return token

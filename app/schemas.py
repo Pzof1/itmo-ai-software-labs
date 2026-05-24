@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -9,7 +9,7 @@ class UserRequest(BaseModel):
     login: str = Field(..., min_length=3, max_length=127)
     password: str = Field(..., min_length=8, max_length=20)
 
-    @field_validator('login')
+    @field_validator("login")
     def name_not_empty(cls, v: str) -> str:
         v = v.strip()
         if len(v) < 3:
@@ -35,13 +35,12 @@ class TaskRequest(BaseModel):
     due_date: datetime | None = None
     description: str | None = Field(None, max_length=1024)
 
-    @field_validator('due_date')
+    @field_validator("due_date")
     def due_date_in_future(cls, v: datetime | None):
         if v:
-            target_date = v.astimezone(
-                timezone.utc).replace(tzinfo=None).date()
+            target_date = v.astimezone(UTC).replace(tzinfo=None).date()
 
-            now_date = datetime.now(timezone.utc).replace(tzinfo=None).date()
+            now_date = datetime.now(UTC).replace(tzinfo=None).date()
 
             if target_date < now_date:
                 raise ValueError("Due date cannot be in the past")
@@ -62,7 +61,7 @@ class TaskResponse(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str
-    token_type: str = 'bearer'
+    token_type: str = "bearer"
 
 
 class TaskUpdateRequest(BaseModel):
@@ -72,13 +71,12 @@ class TaskUpdateRequest(BaseModel):
     due_date: datetime | None = None
     description: str | None = Field(None, max_length=1024)
 
-    @field_validator('due_date')
+    @field_validator("due_date")
     def due_date_in_future(cls, v: datetime | None):
         if v:
-            target_date = v.astimezone(
-                timezone.utc).replace(tzinfo=None).date()
+            target_date = v.astimezone(UTC).replace(tzinfo=None).date()
 
-            now_date = datetime.now(timezone.utc).replace(tzinfo=None).date()
+            now_date = datetime.now(UTC).replace(tzinfo=None).date()
 
             if target_date < now_date:
                 raise ValueError("Due date cannot be in the past")

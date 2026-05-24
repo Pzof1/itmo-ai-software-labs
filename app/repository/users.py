@@ -9,9 +9,10 @@ def get_user_by_id(db: Session, user_id: int) -> User | None:
     return db.execute(stmt).scalar_one_or_none()
 
 
-def create_user(db: Session, login: str, hashed_password: str, telegram_id: int | None = None) -> User:
-    user = User(login=login, hashed_password=hashed_password,
-                telegram_id=telegram_id)
+def create_user(
+    db: Session, login: str, hashed_password: str, telegram_id: int | None = None
+) -> User:
+    user = User(login=login, hashed_password=hashed_password, telegram_id=telegram_id)
     db.add(user)
     db.flush()
     return user

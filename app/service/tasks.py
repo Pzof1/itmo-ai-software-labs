@@ -1,19 +1,26 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+
 from app.enums import TodoStatus
-from app.repository import tasks as tasks_repository
 from app.models import User
+from app.repository import tasks as tasks_repository
 from app.schemas import StatsResponse, TaskRequest, TaskResponse, TaskUpdateRequest
 
 
 def create_task(db: Session, current_user: User, task_data: TaskRequest) -> TaskResponse:
-    task = tasks_repository.create_task(
-        db, current_user.id, task_data)
+    task = tasks_repository.create_task(db, current_user.id, task_data)
     db.commit()
     return TaskResponse.model_validate(task)
 
 
-def get_all_tasks(db: Session, current_user: User, status: TodoStatus | None, sort_by_creation_date: bool, limit: int, offset: int) -> list[TaskResponse]:
+def get_all_tasks(
+    db: Session,
+    current_user: User,
+    status: TodoStatus | None,
+    sort_by_creation_date: bool,
+    limit: int,
+    offset: int,
+) -> list[TaskResponse]:
     """Retrieve and validate a list of tasks for the current user.
 
     Args:
@@ -28,7 +35,8 @@ def get_all_tasks(db: Session, current_user: User, status: TodoStatus | None, so
         list[TaskResponse]: Validated list of tasks ready for API response.
     """
     tasks = tasks_repository.get_all_tasks(
-        db, current_user.id, sort_by_creation_date, status, limit, offset)
+        db, current_user.id, sort_by_creation_date, status, limit, offset
+    )
     return [TaskResponse.model_validate(task) for task in tasks]
 
 
@@ -49,14 +57,13 @@ def delete_task_by_id(db: Session, current_user: User, task_id: int) -> None:
     result = tasks_repository.delete_task_by_id(db, current_user.id, task_id)
 
     if result == 0:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Task {task_id} not found"
-        )
+        raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
     db.commit()
 
 
-def update_task_by_id(db: Session, current_user: User, task_id: int, payload: TaskUpdateRequest) -> TaskResponse:
+def update_task_by_id(
+    db: Session, current_user: User, task_id: int, payload: TaskUpdateRequest
+) -> TaskResponse:
     """Update task by given id.
 
     Args:
@@ -76,46 +83,30 @@ def update_task_by_id(db: Session, current_user: User, task_id: int, payload: Ta
     if not update_data:
         task = tasks_repository.get_task_by_id(db, current_user.id, task_id)
         if not task:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Task {task_id} not found"
-            )
+            raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
         return TaskResponse.model_validate(task)
-    result = tasks_repository.update_task_by_id(
-        db, current_user.id, task_id, update_data)
+    result = tasks_repository.update_task_by_id(db, current_user.id, task_id, update_data)
     if result.rowcount == 0:  # type: ignore
-        raise HTTPException(
-            status_code=404,
-            detail=f"Task {task_id} not found"
-        )
+        raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
     db.commit()
-    updated_task = tasks_repository.get_task_by_id(
-        db, current_user.id, task_id)
+    updated_task = tasks_repository.get_task_by_id(db, current_user.id, task_id)
     return TaskResponse.model_validate(updated_task)
 
 
 def get_task_by_id(db: Session, current_user: User, task_id: int) -> TaskResponse:
     task = tasks_repository.get_task_by_id(db, current_user.id, task_id)
     if not task:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Task {task_id} not found"
-        )
+        raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
 
     return TaskResponse.model_validate(task)
 
 
 def get_tasks_stats(db: Session, current_user: User):
     """Validate tasks count from db to pydantic model."""
-    done_tasks = tasks_repository.get_tasks_count(
-        db, current_user.id,
-        status=TodoStatus.DONE
-    )
+    done_tasks = tasks_repository.get_tasks_count(db, current_user.id, status=TodoStatus.DONE)
 
-    all_tasks = tasks_repository.get_tasks_count(
-        db, current_user.id
-    )
+    all_tasks = tasks_repository.get_tasks_count(db, current_user.id)
 
-    data = {'completed_count': done_tasks, 'total_tasks': all_tasks}
+    data = {"completed_count": done_tasks, "total_tasks": all_tasks}
 
     return StatsResponse.model_validate(data)

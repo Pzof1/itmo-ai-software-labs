@@ -1,5 +1,6 @@
 from sqlalchemy import delete, desc, func, select, update
 from sqlalchemy.orm import Session
+
 from app.enums import TodoStatus
 from app.models import Tasks
 from app.schemas import TaskRequest
@@ -14,7 +15,14 @@ def create_task(db: Session, user_id: int, task_data: TaskRequest):
     return task
 
 
-def get_all_tasks(db: Session, user_id: int, sort_by_creation_date: bool, status: TodoStatus | None, limit: int, offset: int):
+def get_all_tasks(
+    db: Session,
+    user_id: int,
+    sort_by_creation_date: bool,
+    status: TodoStatus | None,
+    limit: int,
+    offset: int,
+):
     """Fetch all tasks for a specific user from the database.
 
     Args:
@@ -44,21 +52,23 @@ def get_all_tasks(db: Session, user_id: int, sort_by_creation_date: bool, status
 
 
 def delete_task_by_id(db: Session, user_id: int, task_id: int):
-    stmt = delete(Tasks).where(Tasks.owner_id ==
-                               user_id).where(Tasks.id == task_id)
+    stmt = delete(Tasks).where(Tasks.owner_id == user_id).where(Tasks.id == task_id)
     result = db.execute(stmt)
     return result.rowcount  # type: ignore
 
 
 def update_task_by_id(db: Session, user_id: int, task_id: int, update_data):
-    stmt = update(Tasks).where(Tasks.owner_id == user_id).where(
-        Tasks.id == task_id).values(**update_data)
+    stmt = (
+        update(Tasks)
+        .where(Tasks.owner_id == user_id)
+        .where(Tasks.id == task_id)
+        .values(**update_data)
+    )
     return db.execute(stmt)
 
 
 def get_task_by_id(db: Session, user_id: int, task_id: int):
-    stmt = select(Tasks).where(Tasks.owner_id ==
-                               user_id).where(Tasks.id == task_id)
+    stmt = select(Tasks).where(Tasks.owner_id == user_id).where(Tasks.id == task_id)
     return db.execute(stmt).scalar_one_or_none()
 
 
