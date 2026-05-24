@@ -5,19 +5,18 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.auth import create_access_token, hash_password, verify_password
+from app.models import User
 from app.repository import users as users_repository
-from app.schemas import TokenResponse, UserResponse, UserTelegramRequest
+from app.schemas import TokenResponse, UserTelegramRequest
 
 
-def create_user(
-    db: Session, login: str, password: str, telegram_id: int | None = None
-) -> UserResponse:
+def create_user(db: Session, login: str, password: str, telegram_id: int | None = None) -> User:
     if users_repository.get_user_by_login(db, login) is not None:
         raise HTTPException(status_code=400, detail="User already exists")
     hashed_password = hash_password(password)
     user = users_repository.create_user(db, login, hashed_password, telegram_id)
     db.commit()
-    return UserResponse.model_validate(user)
+    return user
 
 
 def authenticate_user(db: Session, login: str, password: str) -> TokenResponse:

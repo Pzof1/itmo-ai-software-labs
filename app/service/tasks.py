@@ -85,8 +85,8 @@ def update_task_by_id(
         if not task:
             raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
         return TaskResponse.model_validate(task)
-    result = tasks_repository.update_task_by_id(db, current_user.id, task_id, update_data)
-    if result.rowcount == 0:  # type: ignore
+    rowcount = tasks_repository.update_task_by_id(db, current_user.id, task_id, update_data)
+    if rowcount == 0:
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
     db.commit()
     updated_task = tasks_repository.get_task_by_id(db, current_user.id, task_id)
@@ -101,7 +101,7 @@ def get_task_by_id(db: Session, current_user: User, task_id: int) -> TaskRespons
     return TaskResponse.model_validate(task)
 
 
-def get_tasks_stats(db: Session, current_user: User):
+def get_tasks_stats(db: Session, current_user: User) -> StatsResponse:
     """Validate tasks count from db to pydantic model."""
     done_tasks = tasks_repository.get_tasks_count(db, current_user.id, status=TodoStatus.DONE)
 

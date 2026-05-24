@@ -1,3 +1,4 @@
 ruff==0.15.14
 mypy==2.1.0
 mypy_extensions==1.1.0
+types-python-jose==3.5.0.20260408

@@ -53,7 +53,7 @@ def get_current_user(
     return user
 
 
-def validate_internal_secret(x_internal_secret: Annotated[str | None, Header()] = None):
+def validate_internal_secret(x_internal_secret: Annotated[str | None, Header()] = None) -> None:
     """Validate the internal secret key provided in the request headers.
 
     Args:

@@ -19,4 +19,4 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
 
 
-settings = Settings()  # type: ignore
+settings = Settings()  # pyright: ignore[reportCallIssue]

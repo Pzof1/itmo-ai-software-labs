@@ -10,17 +10,21 @@ router = APIRouter()
 
 
 @router.post("/register", response_model=UserResponse, status_code=201)
-def create_user(payload: UserRequest, db: Session = Depends(get_db)):
+def create_user(payload: UserRequest, db: Session = Depends(get_db)) -> UserResponse:
     return users_service.create_user(db, payload.login, payload.password)
 
 
 @router.post("/login", response_model=TokenResponse)
-def login_user(payload: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login_user(
+    payload: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+) -> TokenResponse:
     return users_service.authenticate_user(db, payload.username, payload.password)
 
 
 @router.post("/login/telegram", response_model=TokenResponse)
 def login_via_telegram(
-    payload: UserTelegramRequest, db: Session = Depends(get_db), _=Depends(validate_internal_secret)
-):
+    payload: UserTelegramRequest,
+    db: Session = Depends(get_db),
+    _: None = Depends(validate_internal_secret),
+) -> TokenResponse:
     return users_service.authenticate_user_via_telegram(db, payload)

@@ -36,7 +36,7 @@ class TaskRequest(BaseModel):
     description: str | None = Field(None, max_length=1024)
 
     @field_validator("due_date")
-    def due_date_in_future(cls, v: datetime | None):
+    def due_date_in_future(cls, v: datetime | None) -> datetime | None:
         if v:
             target_date = v.astimezone(UTC).replace(tzinfo=None).date()
 
@@ -72,7 +72,7 @@ class TaskUpdateRequest(BaseModel):
     description: str | None = Field(None, max_length=1024)
 
     @field_validator("due_date")
-    def due_date_in_future(cls, v: datetime | None):
+    def due_date_in_future(cls, v: datetime | None) -> datetime | None:
         if v:
             target_date = v.astimezone(UTC).replace(tzinfo=None).date()
 
