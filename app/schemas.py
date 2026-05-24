@@ -72,9 +72,21 @@ class TaskUpdateRequest(BaseModel):
     due_date: datetime | None = None
     description: str | None = Field(None, max_length=1024)
 
+    @field_validator('due_date')
+    def due_date_in_future(cls, v: datetime | None):
+        if v:
+            target_date = v.astimezone(
+                timezone.utc).replace(tzinfo=None).date()
+
+            now_date = datetime.now(timezone.utc).replace(tzinfo=None).date()
+
+            if target_date < now_date:
+                raise ValueError("Due date cannot be in the past")
+        return v
+
 
 class StatsResponse(BaseModel):
     completed_count: int
     total_tasks: int
-    
+
     model_config = ConfigDict(from_attributes=True)
