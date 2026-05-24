@@ -45,7 +45,7 @@ def get_current_user(
             raise HTTPException(status_code=401, detail="User is not authorized")
         user_id = int(user_id_str)
     except (JWTError, ValueError):
-        raise HTTPException(status_code=401, detail="Token is invalid")
+        raise HTTPException(status_code=401, detail="Token is invalid") from None
 
     user = get_user_by_id(db, user_id)
     if user is None:

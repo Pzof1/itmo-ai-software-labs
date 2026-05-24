@@ -63,11 +63,11 @@ def authenticate_user_via_telegram(db: Session, payload: UserTelegramRequest) ->
             user = create_user(
                 db, login=username, password=random_password, telegram_id=telegram_id
             )
-        except IntegrityError:
+        except IntegrityError as e:
             db.rollback()
             user = users_repository.get_user_by_telegram_id(db, payload.telegram_id)
             if user is None:
-                raise HTTPException(status_code=500, detail="Database sync error")
+                raise HTTPException(status_code=500, detail="Database sync error") from e
 
     token = create_access_token({"sub": str(user.id)})
     return TokenResponse(access_token=token)
