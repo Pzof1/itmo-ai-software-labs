@@ -1,6 +1,6 @@
 # 📝 TaskFlow API
 
-A professional, production-ready RESTful API for personal task management. This project demonstrates clean architecture, robust security, and DevOps best practices.
+A RESTful API for personal task management. Pet project built with FastAPI, SQLAlchemy 2.0, PostgreSQL.
 
 ## 🚀 Key Features
 
@@ -8,7 +8,7 @@ A professional, production-ready RESTful API for personal task management. This 
 - **Robust Authentication:** Secure OAuth2 password flow with **JWT** tokens and **Bcrypt** password hashing.
 - **Hybrid Authentication:** Supports both standard OAuth2 password flow and Silent S2S (Service-to-Service) Authentication for Telegram clients via secure internal secret validation.
 - **Advanced CRUD:** Full support for pagination, complex filtering (by status), and partial updates (**PATCH**).
-- **Data Integrity:** Enterprise-grade validation with **Pydantic v2** and **SQLAlchemy 2.0** (Mapped/mapped_column style).
+- **Data Integrity:** Validation with **Pydantic v2** and **SQLAlchemy 2.0** (Mapped/mapped_column style).
 - **Modern Infrastructure:** Fully containerized with **Docker** and automated database schema management via **Alembic**.
 
 ## 🛠 Tech Stack
