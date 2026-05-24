@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException, Header
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
+from secrets import compare_digest
 
 from app.config import settings
 from app.database import SessionLocal
@@ -69,5 +70,5 @@ def validate_internal_secret(x_internal_secret: Annotated[str | None, Header()] 
     Raises:
         HTTPException: 403 Forbidden if the secret is missing or invalid.
     """
-    if x_internal_secret is None or x_internal_secret != settings.INTERNAL_BOT_SECRET:
+    if x_internal_secret is None or not compare_digest(x_internal_secret, settings.INTERNAL_BOT_SECRET):
         raise HTTPException(status_code=403, detail='Forbidden')
