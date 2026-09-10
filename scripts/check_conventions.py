@@ -42,7 +42,7 @@ def check_file(path: Path, root: Path) -> list[Diagnostic]:
     is_service = rel.startswith("app/service/")
     is_repo = rel.startswith("app/repository/")
     is_task_routes = rel == "app/api/v1/tasks.py"
-    is_api_test = rel.startswith("tests/test_api/") or rel.startswith("tests/test_")
+    is_api_test = rel.startswith("tests/test_api/")
 
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):
