@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import BIGINT, ForeignKey, String
+from sqlalchemy import BIGINT, ForeignKey, String, false
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -21,6 +21,7 @@ class Tasks(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    is_deleted: Mapped[bool] = mapped_column(default=False, server_default=false())
     name: Mapped[str] = mapped_column(nullable=False)
     status: Mapped[TodoStatus] = mapped_column(String, default=TodoStatus.PENDING)
     description: Mapped[str | None]

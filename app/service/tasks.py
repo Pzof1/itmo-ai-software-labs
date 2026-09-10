@@ -61,6 +61,18 @@ def delete_task_by_id(db: Session, current_user: User, task_id: int) -> None:
     db.commit()
 
 
+def restore_task_by_id(db: Session, current_user: User, task_id: int) -> TaskResponse:
+    rowcount = tasks_repository.restore_task_by_id(db, current_user.id, task_id)
+    if rowcount == 0:
+        task = tasks_repository.get_task_by_id(db, current_user.id, task_id)
+        if task is None:
+            raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+        raise HTTPException(status_code=409, detail=f"Task {task_id} is already active")
+    db.commit()
+    task = tasks_repository.get_task_by_id(db, current_user.id, task_id)
+    return TaskResponse.model_validate(task)
+
+
 def update_task_by_id(
     db: Session, current_user: User, task_id: int, payload: TaskUpdateRequest
 ) -> TaskResponse:

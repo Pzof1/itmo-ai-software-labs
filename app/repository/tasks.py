@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from typing import Any
 
-from sqlalchemy import delete, desc, func, select, update
+from sqlalchemy import desc, func, select, update
 from sqlalchemy.orm import Session
 
 from app.enums import TodoStatus
@@ -39,7 +39,7 @@ def get_all_tasks(
     Returns:
         List[Tasks]: A list of task model instances.
     """
-    stmt = select(Tasks).where(Tasks.owner_id == user_id)
+    stmt = select(Tasks).where(Tasks.owner_id == user_id, Tasks.is_deleted.is_(False))
 
     if status == TodoStatus.ACTIVE:
         stmt = stmt.where(Tasks.status != TodoStatus.DONE)
@@ -55,9 +55,22 @@ def get_all_tasks(
 
 
 def delete_task_by_id(db: Session, user_id: int, task_id: int) -> int:
-    stmt = delete(Tasks).where(Tasks.owner_id == user_id).where(Tasks.id == task_id)
+    stmt = (
+        update(Tasks)
+        .where(Tasks.owner_id == user_id, Tasks.id == task_id, Tasks.is_deleted.is_(False))
+        .values(is_deleted=True)
+    )
     result = db.execute(stmt)
     return result.rowcount  # type: ignore
+
+
+def restore_task_by_id(db: Session, user_id: int, task_id: int) -> int:
+    stmt = (
+        update(Tasks)
+        .where(Tasks.owner_id == user_id, Tasks.id == task_id, Tasks.is_deleted.is_(True))
+        .values(is_deleted=False)
+    )
+    return db.execute(stmt).rowcount  # type: ignore
 
 
 def update_task_by_id(db: Session, user_id: int, task_id: int, update_data: dict[str, Any]) -> int:
@@ -65,19 +78,24 @@ def update_task_by_id(db: Session, user_id: int, task_id: int, update_data: dict
         update(Tasks)
         .where(Tasks.owner_id == user_id)
         .where(Tasks.id == task_id)
+        .where(Tasks.is_deleted.is_(False))
         .values(**update_data)
     )
     return db.execute(stmt).rowcount  # type: ignore
 
 
 def get_task_by_id(db: Session, user_id: int, task_id: int) -> Tasks | None:
-    stmt = select(Tasks).where(Tasks.owner_id == user_id).where(Tasks.id == task_id)
+    stmt = select(Tasks).where(
+        Tasks.owner_id == user_id, Tasks.id == task_id, Tasks.is_deleted.is_(False)
+    )
     return db.execute(stmt).scalar_one_or_none()
 
 
 def get_tasks_count(db: Session, user_id: int, status: TodoStatus | None = None) -> int | None:
     """Count tasks. If status selcted count with status filter."""
-    stmt = select(func.count(Tasks.id)).where(Tasks.owner_id == user_id)
+    stmt = select(func.count(Tasks.id)).where(
+        Tasks.owner_id == user_id, Tasks.is_deleted.is_(False)
+    )
 
     if status:
         stmt = stmt.where(Tasks.status == status)

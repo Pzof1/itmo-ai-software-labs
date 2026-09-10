@@ -42,6 +42,18 @@ def delete_task_by_id(
     return tasks_service.delete_task_by_id(db, current_user, task_id)
 
 
+@router.post(
+    "/tasks/{task_id}/restore",
+    response_model=TaskResponse,
+    summary="Restore deleted task with id",
+    status_code=200,
+)
+def restore_task_by_id(
+    task_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+) -> TaskResponse:
+    return tasks_service.restore_task_by_id(db, current_user, task_id)
+
+
 @router.patch("/tasks/{task_id}", response_model=TaskResponse, summary="Update task with id")
 def update_task_by_id(
     task_id: int,
