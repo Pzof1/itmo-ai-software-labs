@@ -71,6 +71,16 @@ def get_tasks_stats(
     return tasks_service.get_tasks_stats(db, current_user)
 
 
+@router.get("/tasks/trash", response_model=list[TaskResponse], summary="Show deleted tasks")
+def get_deleted_tasks(
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> list[TaskResponse]:
+    return tasks_service.get_deleted_tasks(db, current_user, limit, offset)
+
+
 @router.get("/tasks/{task_id}", response_model=TaskResponse, summary="Show task with id")
 def get_task_by_id(
     task_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)

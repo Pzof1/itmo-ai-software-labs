@@ -54,6 +54,17 @@ def get_all_tasks(
     return db.execute(stmt).scalars().all()
 
 
+def get_deleted_tasks(db: Session, user_id: int, limit: int, offset: int) -> Sequence[Tasks]:
+    stmt = (
+        select(Tasks)
+        .where(Tasks.owner_id == user_id, Tasks.is_deleted.is_(True))
+        .order_by(Tasks.id)
+        .limit(limit)
+        .offset(offset)
+    )
+    return db.execute(stmt).scalars().all()
+
+
 def delete_task_by_id(db: Session, user_id: int, task_id: int) -> int:
     stmt = (
         update(Tasks)

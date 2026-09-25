@@ -40,6 +40,13 @@ def get_all_tasks(
     return [TaskResponse.model_validate(task) for task in tasks]
 
 
+def get_deleted_tasks(
+    db: Session, current_user: User, limit: int, offset: int
+) -> list[TaskResponse]:
+    tasks = tasks_repository.get_deleted_tasks(db, current_user.id, limit, offset)
+    return [TaskResponse.model_validate(task) for task in tasks]
+
+
 def delete_task_by_id(db: Session, current_user: User, task_id: int) -> None:
     """Delete task by given id.
 
